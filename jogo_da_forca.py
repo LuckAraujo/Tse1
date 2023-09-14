@@ -5,10 +5,10 @@ import sqlite3
 from sqlite3 import Error
 
 class Forca(Frame):
-    def __init__(self, master, dificuldade):
+    def __init__(self, master, dificuldade, tema):
         Frame.__init__(self, master)
         # inicializa variáveis
-        self.temas = ['Cores', 'Animais', 'Objetos', 'Paises', 'Programas De TV']
+        self.temas = tema
         self.cores_padrao_botoes = ["#F0F0F0"]
         self.palavra = None
         self.letras_digitadas = None
@@ -56,9 +56,9 @@ class Forca(Frame):
         self.palavra_secreta = []
         self.contador = 10
         self.label_contador['text'] = self.contador
-        self.tema_id = random.randint(1, len(self.temas))
-        self.tema_atual = self.temas[self.tema_id - 1]
-        self.tema_atual_label['text'] = self.tema_atual
+        #self.tema_id = random.randint(1, len(self.temas))
+        #elf.tema_atual = self.temas[self.tema_id - 1]
+        #self.tema_atual_label['text'] = self.tema_atual
         self.palavra_secreta_label['text'] = ""    
                 
         self.sorteia_palavra()
@@ -211,27 +211,28 @@ class Forca(Frame):
         con = sqlite3.connect('banco7.db')
         cursor = con.cursor()
         
-        # Seleciona um tema aleatório
+        cursor.execute(f"SELECT tem_id FROM temas WHERE tem_nome = ?", (self.temas,))
+        id = cursor.fetchone()
 
-        cursor.execute(f"SELECT pal_palavra FROM palavras WHERE tem_id_fk = {self.tema_id} AND pal_dificuldade = ? ORDER BY RANDOM() LIMIT 1", (self.dificuldade,))
+        cursor.execute(f"SELECT pal_palavra FROM palavras WHERE tem_id_fk = {id[0]} AND pal_dificuldade = ? ORDER BY RANDOM() LIMIT 1", (self.dificuldade,))
         resultado = cursor.fetchone()
+
         
         if resultado:
             self.palavra = resultado[0].upper()
             self.palavra_secreta = ["_" if char.isalpha() else char for char in self.palavra]
         else:
-            # Trata o caso em que nenhuma palavra é encontrada
-            self.palavra = "PADRAO"  # Você pode definir uma palavra padrão
+            
+            self.palavra = "PADRAO"  
             self.palavra_secreta = ["_" for _ in self.palavra]
 
-        # Fecha a conexão com o banco de dados
         con.close()
-        # Atualiza a palavra exibida na tela
+
         self.palavra_secreta_label['text'] = " ".join(self.palavra_secreta)
 
 
     def create_widgets(self):
-        #Frame teclado letras
+ 
         self.frame1 = Frame(self, relief = SUNKEN, borderwidth=8)
         self.frame1.grid(row=5)
 
@@ -329,10 +330,10 @@ class Forca(Frame):
         self.tema_label.grid(row=0, columnspan=6)
 
         # Adiciona um rótulo para exibir o tema atual da palavra secreta
-        self.tema_atual_label = Label(self.frame2, text="", font=("Helvetica", 12))
+        self.tema_atual_label = Label(self.frame2, text=self.temas, font=("Helvetica", 12))
         self.tema_atual_label.grid(row=1)
 
-        # contador de erros
+        # Contador de erros
         self.frame3 = Frame(self, relief = SUNKEN,borderwidth=8)
         self.frame3.grid(row=3,sticky="NWNESWSE")
 
@@ -343,7 +344,7 @@ class Forca(Frame):
         self.label_contador.grid(row=1, column=0, rowspan=2, columnspan=2)
 
 
-        #Palavra secreta
+        # Palavra secreta
         self.frame4 = Frame(self, relief = SUNKEN,borderwidth=8)
         self.frame4.grid(row=4,sticky="NWNESWSE")
 

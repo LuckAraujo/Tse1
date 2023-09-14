@@ -12,8 +12,6 @@ Programas_Tv=["Friends", "Game of Thrones", "Breaking Bad", "The Simpsons", "Str
     "The Office", "The Crown", "The Mandalorian", "Black Mirror","Friends", "House of Cards", "Westworld", "Vikings", "The Big Bang Theory"]
 
 
-
-
 #Função para conectar no banco de dados#######
 def conecta():
     try:
@@ -38,8 +36,8 @@ sql_criar_palavra = '''CREATE TABLE palavras (
 );'''
 sql_criar_jogadores = '''CREATE TABLE jogadores (
     "id_jogador" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "jog_nome" VARCHAR(100) NOT NULL,
-    "jog_email" VARCHAR(256) NOT NULL,
+    "jog_nome" INTEGER NOT NULL,
+    "jog_email" VARCHAR(250) NOT NULL,
     "jog_senha" VARCHAR(100) NOT NULL,
     "jog_pontuacao" VARCHAR NOT NULL
 );'''
@@ -73,7 +71,7 @@ criar_tabela(sql_criar_palavra)
 criar_tabela(sql_criar_jogadores)
 ############INSERTS DE NAS TABELAS###############
 for i in Temas:
-    sql_inserir_Temas = f"INSERT INTO Temas VALUES (NULL,'{i}');"
+    sql_inserir_Temas = f"INSERT INTO temas VALUES (NULL,'{i}');"
     inserir(sql_inserir_Temas)
 
 for i in Cores:

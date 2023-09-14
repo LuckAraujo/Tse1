@@ -1,3 +1,4 @@
+import sqlite3
 import re
 import os
 import tkinter as tk
@@ -42,24 +43,67 @@ class Tela():
         btn3.pack(padx= 20, pady=20)
 
     def abrir_categorias(self):
-            email= self.e_email.get()
-            padrao_email = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-
-            #aqui tbm vai ficar a parte onde vamos validar o email se ele é o do cara mesmo pode ser os da senha tbm
-            if not re.match(padrao_email, email): 
-                messagebox.showerror(title= "Email Invalido", message="E-mail não segue o formato padrão")
-
-            else:
-                for widget in self.janela.winfo_children():
-                    widget.destroy()
+        for widget in self.janela.winfo_children():
+                 widget.destroy()
                 
-                self.janela = self.janela
-                self.janela.geometry('800x600')
-                self.janela.title('Escolha uma Categoria')
-                self.janela.configure(bg='#3D89E1')
+        self.janela = self.janela
+        self.janela.geometry('800x600')
+        self.janela.title('Escolha uma Categoria')
+        self.janela.configure(bg='#3D89E1')
+
+        botV = tk.Button(self.janela, image=self.b_volta, command= self.tem_certeza, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, anchor= tk.W)
                 
-                letraA = tk.Button(self.janela, text="FDS")
-                letraA.pack()
+        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10), command=lambda: self.J_conta("Cores"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_cores.pack(padx=5, pady=5)
+
+        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), command=lambda: self.J_conta('Animais'),
+        bg="#FF9933", activebackground="#FF9933")
+        b_animais.pack(padx=5, pady=5)
+
+        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), command=lambda: self.J_conta('Objetos'),
+        bg="#FF9933", activebackground="#FF9933")
+        b_objetos.pack(padx=5, pady=5)
+
+        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), command=lambda: self.J_conta('Paises'),
+        bg="#FF9933", activebackground="#FF9933")
+        b_paises.pack(padx=5, pady=5)
+            
+        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10),command=lambda: self.J_conta("Programas De TV"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_programasTv.pack(padx= 5, pady= 5)
+    
+    def J_conta(self, temas):
+        for widget in self.janela.winfo_children():
+                widget.destroy()
+            
+        self.janela = self.janela
+        self.janela.geometry('800x600')
+        self.janela.title('Escolha uma Dificuldade')
+        self.janela.configure(bg='#3D89E1')
+
+    
+        botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, anchor= tk.W)
+
+        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),
+        bg="#FF9933", activebackground="#FF9933")
+        b_ranque.pack(padx= 5, pady= 5)
+            
+        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), command=lambda: self.dificuldadeF(temas, "faz o L"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_facil.pack(padx= 5, pady= 5)
+
+        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), command=lambda: self.dificuldadeM(temas,"faz o L"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_medio.pack(padx= 5, pady= 5)
+
+        b_dificil = tk.Button(self.janela, text= "difícil", font=("Arial Black", 10), command=lambda: self.dificuldadeD(temas, "faz o L"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_dificil.pack(padx= 5, pady= 5)
 
     
     def entrar(self):
@@ -84,12 +128,35 @@ class Tela():
             l_senha.pack(padx= 5, pady= 5)
             self.e_senha = tk.Entry(self.janela, width= 30, show="*")
             self.e_senha.pack(padx= 5, pady= (0, 5))
-
+            
             b_entrar = tk.Button(self.janela, text= "Logar", font=("Arial Black", 10), 
-            bg="#FF9933", activebackground="#FF9933", command= self.abrir_categorias)
+            bg="#FF9933", activebackground="#FF9933", command= self.logar)
             b_entrar.pack(padx= 5, pady= 5)
 
-    
+    def logar(self):
+        email =self.e_email.get()
+        senha=self.e_senha.get()
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT jog_email, jog_senha FROM jogadores")
+        res=cursor.fetchall()
+        con.close()
+        senhaV = False
+        emailV = False
+
+        for x in res:
+            if x[0] == email and x[1] == senha:
+                emailV = True
+                senhaV = True
+
+        for row in res:
+                if emailV and senhaV:  # Supondo que o email está na terceira coluna e a senha na quarta coluna
+                    emailV = False
+                    senhaV = False
+                    self.abrir_categorias()
+                return 
+        messagebox.showinfo('Aviso', 'O Email ou Senha Estão Incorretos')
+
     def cadastrar(self):
             for widget in self.janela.winfo_children():
                 widget.destroy()
@@ -119,41 +186,113 @@ class Tela():
             self.e_senha.pack(padx= 5, pady= (0, 5))
 
             b_entrar = tk.Button(self.janela, text= "Criar Conta", font=("Arial Black", 10), 
-            bg="#FF9933", activebackground="#FF9933")
+            bg="#FF9933", activebackground="#FF9933",command=self.confirmar)
             b_entrar.pack(padx= 5, pady= 5)
 
+    def confirmar(self):
+        nome=self.nome.get()
+        email=self.e_email.get()
+        senha=self.e_senha.get()
+        padrao_email = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pont=0
+        existe = False
+
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT jog_email FROM jogadores")
+        res=cursor.fetchall()
+        con.close()
+        
+        for x in res:
+            if x[0] == email:
+                existe = True
+
+        if nome == '' or senha == '' or email == '':
+            messagebox.showinfo('Aviso', 'Por favor, todos os campos são obrigatórios.', parent=self.janela)
+        elif not re.match(padrao_email, email): 
+            messagebox.showerror(title= "Email Invalido", message="E-mail não segue o formato padrão")
+        elif existe:
+            messagebox.showerror(title= "Existe", message="E-mail já existe")
+            existe = False
+        else:
+             con = sqlite3.connect('banco7.db')
+             cursor = con.cursor()
+             cursor.execute(f"INSERT INTO jogadores VALUES (NULL,'{nome}','{email}','{senha}','{pont}')")
+             con.commit()
+             con.close()
+             messagebox.showinfo('Aviso','Sua Conta foi cadastrada',parent=self.janela)
     
     def visitante(self):
-            for widget in self.janela.winfo_children():
-                widget.destroy()
+        for widget in self.janela.winfo_children():
+            widget.destroy()
             
-            self.janela = self.janela
-            self.janela.geometry('800x600')
-            self.janela.title('Visitante')
-            self.janela.configure(bg='#3D89E1')
-
+        self.janela = self.janela
+        self.janela.geometry('800x600')
+        self.janela.title('Visitante')
+        self.janela.configure(bg='#3D89E1')
     
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.volta, 
-            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.pack(padx= 5, pady= 5, anchor= tk.W)
+        botV = tk.Button(self.janela, image=self.b_volta, command= self.volta, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, anchor= tk.W)
 
-            b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),
-            bg="#FF9933", activebackground="#FF9933")
-            b_ranque.pack(padx= 5, pady= 5)
+        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10), command=lambda: self.forcaVisitante("Cores"),
+                    bg="#FF9933", activebackground="#FF9933")
+        b_cores.pack(padx=5, pady=5)
+
+        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Animais'),
+                            bg="#FF9933", activebackground="#FF9933")
+        b_animais.pack(padx=5, pady=5)
+
+        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Objetos'),
+                            bg="#FF9933", activebackground="#FF9933")
+        b_objetos.pack(padx=5, pady=5)
+
+        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Paises'),
+                            bg="#FF9933", activebackground="#FF9933")
+        b_paises.pack(padx=5, pady=5)
+        
+        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10),command=lambda: self.forcaVisitante("Programas De TV"),
+        bg="#FF9933", activebackground="#FF9933")
+        b_programasTv.pack(padx= 5, pady= 5)
+
+        
+    
+    def forcaVisitante(self,tex):
+        tema = tex
+        if tema == "Cores" or tema == "Animais" or tema == "Objetos" or tema == "Paises" or tema == "Programas De TV":
+            self.pegar(tema)
+    
+    def pegar(self, tema):
+        for widget in self.janela.winfo_children():
+            widget.destroy()
+        
+        self.janela = self.janela
+        self.janela.geometry('800x600')
+        self.janela.title('Escolha uma Dificuldade')
+        self.janela.configure(bg='#3D89E1')
+        
+        botV = tk.Button(self.janela, image=self.b_volta,command= self.visitante, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, anchor= tk.W)
+
+        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),
+        bg="#FF9933", activebackground="#FF9933")
+        b_ranque.pack(padx= 5, pady= 5)
             
-            b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), command= self.dificuldadeF,
-            bg="#FF9933", activebackground="#FF9933")
-            b_facil.pack(padx= 5, pady= 5)
+        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), 
+        command=lambda: self.dificuldadeF(tema, "Visitante"), bg="#FF9933", activebackground="#FF9933")
+        b_facil.pack(padx= 5, pady= 5)
 
-            b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), command= self.dificuldadeM,
-            bg="#FF9933", activebackground="#FF9933")
-            b_medio.pack(padx= 5, pady= 5)
+        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), 
+        command=lambda: self.dificuldadeM(tema, "Visitante"), bg="#FF9933", activebackground="#FF9933")
+        b_medio.pack(padx= 5, pady= 5)
 
-            b_dificil = tk.Button(self.janela, text= "difícil", font=("Arial Black", 10), command= self.dificuldadeD,
-            bg="#FF9933", activebackground="#FF9933")
-            b_dificil.pack(padx= 5, pady= 5)
+        b_dificil = tk.Button(self.janela, text= "difícil", font=("Arial Black", 10), 
+        command=lambda: self.dificuldadeD(tema,"Visitante"), bg="#FF9933", activebackground="#FF9933")
+        b_dificil.pack(padx= 5, pady= 5)
+        
     
-    def dificuldadeF(self):
+    def dificuldadeF(self, tema, T_conta):
         for widget in self.janela.winfo_children():
                 widget.destroy()
             
@@ -161,15 +300,21 @@ class Tela():
         self.janela.geometry('800x600')
         self.janela.title('Forca Fácil')
         self.janela.configure(bg='#3D89E1')
-        
-        botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
-        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
 
-        forca = Forca(self.janela, "Facil")
+        if T_conta == "Visitante":
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+        
+        else:
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+
+        forca = Forca(self.janela, "Facil", tema)
         forca.grid(row=1, column=0)
     
-    def dificuldadeM(self):
+    def dificuldadeM(self,tema, T_conta):
         for widget in self.janela.winfo_children():
                 widget.destroy()
             
@@ -178,15 +323,21 @@ class Tela():
         self.janela.title('Forca Médio')
         self.janela.configure(bg='#3D89E1')
         
-        botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
-        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+        if T_conta == "Visitanta":
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+        
+        else:
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
 
-        forca = Forca(self.janela, "Medio")
+        forca = Forca(self.janela, "Medio", tema)
         forca.grid(row=1, column=0)
 
     
-    def dificuldadeD(self):
+    def dificuldadeD(self, tema, T_conta):
         for widget in self.janela.winfo_children():
                 widget.destroy()
             
@@ -195,20 +346,32 @@ class Tela():
         self.janela.title('Forca Difícil')
         self.janela.configure(bg='#3D89E1')
         
-        botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
-        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+        if T_conta == "Visitanta":
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+        
+        else:
+            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
 
-        forca = Forca(self.janela, "Dificil")
+        forca = Forca(self.janela, "Dificil", tema)
         forca.grid(row=1, column=0)
+
+    def tem_certeza(self):
+        vai = messagebox.askokcancel(title= "Tem certeza?", message = "Quer mesmo sair de sua conta?", icon=messagebox.WARNING)
+        if vai:
+            for widget in self.janela.winfo_children():
+                widget.destroy()
+        
+            self.telaInicial()  
 
     def volta(self):
         for widget in self.janela.winfo_children():
                 widget.destroy()
         
-        self.telaInicial()
-    
-
+        self.telaInicial()  
        
 app = tk.Tk()
 Tela(app)
