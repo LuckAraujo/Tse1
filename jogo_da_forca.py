@@ -5,7 +5,7 @@ import sqlite3
 from sqlite3 import Error
 
 class Forca(Frame):
-    def __init__(self, master, dificuldade, tema):
+    def __init__(self, master, dificuldade, tema, conta = 0):
         Frame.__init__(self, master)
         # inicializa variáveis
         self.temas = tema
@@ -15,6 +15,7 @@ class Forca(Frame):
         self.palavra_secreta = None
         self.contador = None
         self.dificuldade = dificuldade
+        self.id_conta=conta
 
         # inicializa widgets do jogo
         self.create_widgets()
@@ -54,8 +55,7 @@ class Forca(Frame):
         self.reset_cores_botoes()
         self.letras_digitadas = []
         self.palavra_secreta = []
-        self.contador = 10
-        self.label_contador['text'] = self.contador
+        self.contador = 6
         #self.tema_id = random.randint(1, len(self.temas))
         #elf.tema_atual = self.temas[self.tema_id - 1]
         #self.tema_atual_label['text'] = self.tema_atual
@@ -133,8 +133,6 @@ class Forca(Frame):
             try: 
                 if l in self.letras_digitadas:    
                     self.contador -= 1            
-                    self.label_contador['text'] = self.contador
-                    
                     if l == "A" or l == "Á" or l == "Â" or l == "Ã":
                         l = letra
                         self.letraA.configure(background="#737991", activebackground="#737991")
@@ -202,7 +200,13 @@ class Forca(Frame):
 
         if "_" not in self.palavra_secreta:
             messagebox.showinfo("Congrats", "Parabéns você acertou a palavra secreta\n{}".format(self.palavra))
+            con = sqlite3.connect('banco7.db')
+            cursor = con.cursor()
+            cursor.execute(f"UPDATE jogadores set jog_pontuacao='{self.contador*100}' WHERE id_jogador = '{self.id_conta}'")
+            con.commit()
+            con.close()
             self.inicio_jogo()
+            
     def reinicia(self):
         for widget in self.janela.winfo_children():
                 widget.destroy()
@@ -327,7 +331,7 @@ class Forca(Frame):
 
        # Altera o rótulo para exibir "TEMA" em vez de "LETRAS DIGITADAS"
         self.tema_label = Label(self.frame2, text="TEMA", font=("Helvetica", 12))
-        self.tema_label.grid(row=0, columnspan=6)
+        self.tema_label.grid(row=0, columnspan=6, sticky="W")
 
         # Adiciona um rótulo para exibir o tema atual da palavra secreta
         self.tema_atual_label = Label(self.frame2, text=self.temas, font=("Helvetica", 12))
@@ -337,12 +341,26 @@ class Forca(Frame):
         self.frame3 = Frame(self, relief = SUNKEN,borderwidth=8)
         self.frame3.grid(row=3,sticky="NWNESWSE")
 
-        self.chances_restantes_label = Label(self.frame3, text="CHANCES RESTANTES", font=("Helvetica", 12))
-        self.chances_restantes_label.grid(row=0, columnspan=6)
+        if self.id_conta == 0:
+            self.chances_restantes_label = Label(self.frame3, text="Pontuação", font=("Helvetica", 12))
+            self.chances_restantes_label.grid(row=0, columnspan=6)
 
-        self.label_contador = Label(self.frame3, font=("Helvetica", 20), text = self.contador,padx=10, pady=10)        
-        self.label_contador.grid(row=1, column=0, rowspan=2, columnspan=2)
+            self.label = Label(self.frame3, font=("Helvetica", 20), text = "****",padx=10, pady=10)        
+            self.label.grid(row=1, column=0, rowspan=2, columnspan=2)
+        
+        else:
+            con = sqlite3.connect('banco7.db')
+            cursor = con.cursor()
+            cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
+            self.pontu = cursor.fetchone()
+            print(self.pontu)
 
+            self.chances_restantes_label = Label(self.frame3, text="Pontuação", font=("Helvetica", 12))
+            self.chances_restantes_label.grid(row=0, columnspan=6)
+
+            self.label_contador = Label(self.frame3, font=("Helvetica", 20), text = self.pontu, padx=10, pady=10)        
+            self.label_contador.grid(row=1, column=0, rowspan=2, columnspan=2)
+            con.close()
 
         # Palavra secreta
         self.frame4 = Frame(self, relief = SUNKEN,borderwidth=8)
@@ -360,3 +378,4 @@ def main():
     forca = Tk()
     app = Forca(forca).grid()
     forca.mainloop()
+

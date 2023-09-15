@@ -3,13 +3,58 @@ from sqlite3 import Error
 
 ########Listagem de Palavras##########3
 Temas=['Cores','Animais','Objetos','Paises','Programas De TV']
-Cores = ["vermelho", "verde", "azul", "amarelo", "roxo", "laranja", "rosa", "marrom", "cinza"]
-Animais=["Leão","Elefante","Girafa","Tubarão","Pinguim","Gorila","Tigre","Tartaruga","Águia","Polvo","Canguru","Cobra","Panda",
-"Camaleão","Jacaré"]
-Obejtos = ["Carro", "Avião", "Bicicleta", "Televisão", "Computador", "Sofá", "Celular", "Mesa", "Cadeira", "Relógio", "Óculos", "Câmera", "Guitarra", "Livro", "Bola"]
-Paises = ["Estados Unidos", "Canadá", "Brasil", "França", "Japão", "Austrália", "Alemanha", "Espanha", "Rússia", "China", "Índia", "México", "Argentina", "Itália", "Reino Unido"]
-Programas_Tv=["Friends", "Game of Thrones", "Breaking Bad", "The Simpsons", "Stranger Things",
-    "The Office", "The Crown", "The Mandalorian", "Black Mirror","Friends", "House of Cards", "Westworld", "Vikings", "The Big Bang Theory"]
+Cores = [
+    "vermelho", "verde", "azul", "amarelo", "roxo", "laranja", "rosa", "marrom", "cinza",
+    "preto", "branco", "turquesa", "dourado", "prata", "bronze", "bege", "coral",
+    "índigo", "ciano", "magenta", "lilás", "safira", "ouro rosa", "verde limão", "pêssego",
+    "jade", "marfim", "tijolo", "malva", "carvão", "azul celeste", "vermelho escarlate",
+    "verde-oliva", "vinho", "violeta", "azul marinho", "azul-turquesa", "cereja", "caramelo",
+    "mostarda", "topázio", "verde-água", "coral claro", "azul royal", "lavanda", "chumbo",
+    "rosa choque", "terracota", "azul-petróleo", "salmão"
+]
+
+
+Animais = [
+    "Leão", "Elefante", "Girafa", "Tubarão", "Pinguim", "Gorila", "Tigre", "Tartaruga", "Águia", "Polvo", 
+    "Canguru", "Cobra", "Panda", "Camaleão", "Jacaré", "Zebra", "Rinoceronte", "Hipopótamo", "Lobo", "Orca", 
+    "Alce", "Guepardo", "Leopardo", "Suricata", "Foca", "Arara", "Papagaio", "Urso polar", "Esquilo", "Texugo", 
+    "Panda-vermelho", "Lêmure", "Coala", "Porco-espinho", "Chimpanzé", "Morsa", "Golfinho", "Raposa", "Toupeira", 
+    "Baleia", "Lontra", "Castor", "Gato selvagem", "Puma", "Gambá"
+]
+
+
+
+Objetos = [
+    "Carro", "Avião", "Bicicleta", "Televisão", "Computador", "Sofá", "Celular", "Mesa", "Cadeira", "Relógio",
+    "Óculos", "Câmera", "Guitarra", "Livro", "Bola", "Barco", "Fogão", "Geladeira", "Forno", "Laptop", "Microfone",
+    "Rádio", "Violino", "Teclado", "Mochila", "Faca", "Garfo", "Colher", "Liquidificador", "Ventilador", "Lâmpada",
+    "Escova de dentes", "Secador de cabelo", "Cama", "Travesseiro", "Piano", "Tablet", "Binóculos", "Microscópio",
+    "Telescópio", "Skate", "Patins", "Máquina de lavar roupa"
+]
+
+Paises = [
+    "Estados Unidos", "Canadá", "Brasil", "França", "Japão", "Austrália", "Alemanha", "Espanha", "Rússia",
+    "China", "Índia", "México", "Argentina", "Itália", "Reino Unido", "África do Sul", "Canadá", "Suíça", "Suécia",
+    "Noruega", "Holanda", "Bélgica", "Dinamarca", "Portugal", "Grécia", "Turquia", "Irlanda", "Áustria", "Polônia",
+    "Hungria", "Chile", "Colômbia", "Peru", "Venezuela", "Uruguai", "Nova Zelândia", "Singapura", "Malásia",
+    "Tailândia", "Filipinas", "Vietnã", "Coreia do Sul", "Arábia Saudita", "Emirados Árabes Unidos", "Egito",
+    "Nigéria", "África do Sul"
+]
+
+Programas_Tv = [
+    "Friends", "Game of Thrones", "Breaking Bad", "The Simpsons", "Stranger Things",
+    "The Office", "The Crown", "The Mandalorian", "Black Mirror", "House of Cards",
+    "Westworld", "Vikings", "The Witcher", "The Walking Dead",
+    "Sherlock", "Peaky Blinders", "Narcos", "Mindhunter", "Fargo", "Chernobyl", "The Expanse",
+    "Better Call Saul", "The Handmaid's Tale", "Lost", "The Sopranos", "The West Wing",
+    "The X-Files", "Doctor Who", "Dexter", "Homeland", "The Blacklist", "Prison Break",
+    "Suits", "The Good Place", "Stranger Things", "The Haunting of Hill House",
+    "The Umbrella Academy", "The Boys", "Supernatural", "Rick and Morty",
+    "The Marvelous Mrs. Maisel", "Bridgerton", "Money Heist", "The Queen's Gambit",
+    "Dark", "O Mecanismo", "Narcos: Mexico", "A Grande Família", "Toma Lá, Dá Cá",
+    "Avenida Brasil", "Cidade dos Homens", "Sob Pressão", "O Auto da Compadecida"
+]
+
 
 
 #Função para conectar no banco de dados#######
@@ -101,7 +146,7 @@ for i in Animais:
         sql_inserir_Palavra = f"INSERT INTO palavras VALUES (NULL,{n},'{i}','Dificil');"
     lista.clear()
     inserir(sql_inserir_Palavra)
-for i in Obejtos:
+for i in Objetos:
     n=3
     lista=[]
     for letra in i:

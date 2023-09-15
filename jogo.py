@@ -27,6 +27,9 @@ class Tela():
         img_path2 = os.path.join(pastaAPP, "imagem", "adas.png")
         self.b_volta = PhotoImage(file=img_path2)
 
+        img_path3 = os.path.join(pastaAPP, "imagem", "asdasda.png")
+        self.apontaD = PhotoImage(file=img_path3)
+
         btn1 = tk.Button(self.janela, text="Entrar",  height=2 ,width=20,  command=self.entrar,
         bg="#FF8000", activebackground="#FF8000", font=("Arial Black", 10))
         
@@ -48,33 +51,55 @@ class Tela():
                 
         self.janela = self.janela
         self.janela.geometry('800x600')
-        self.janela.title('Escolha uma Categoria')
+        self.janela.title('Escolha um Tema')
         self.janela.configure(bg='#3D89E1')
+
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT jog_nome,jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id,))
+        res=cursor.fetchall()
+        con.close()
 
         botV = tk.Button(self.janela, image=self.b_volta, command= self.tem_certeza, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.pack(padx= 5, pady= 5, anchor= tk.W)
                 
-        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10), command=lambda: self.J_conta("Cores"),
-        bg="#FF9933", activebackground="#FF9933")
-        b_cores.pack(padx=5, pady=5)
+        l_nome = tk.Button(self.janela, text=res[0][0],font=("Arial Black", 10), height=1 ,width=10,
+        bg="#FFFF33", relief="raised",activebackground= "#FFFF33")
 
-        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), command=lambda: self.J_conta('Animais'),
-        bg="#FF9933", activebackground="#FF9933")
-        b_animais.pack(padx=5, pady=5)
+        b_ranque = tk.Button(self.janela, text= "Ranque",height=2 ,width=20, font=("Arial Black", 10),
+        bg="#FFFF66", activebackground="#FFFF66")
 
-        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), command=lambda: self.J_conta('Objetos'),
-        bg="#FF9933", activebackground="#FF9933")
-        b_objetos.pack(padx=5, pady=5)
+        l_tema = tk.Label(self.janela, image= self.apontaD, bg='#3D89E1')
 
-        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), command=lambda: self.J_conta('Paises'),
-        bg="#FF9933", activebackground="#FF9933")
-        b_paises.pack(padx=5, pady=5)
+        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10), height=2 ,width=20, 
+        command=lambda: self.J_conta("Cores"), bg="#FF9933", activebackground="#FF9933")
+
+        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.J_conta('Animais'), bg="#FF9933", activebackground="#FF9933")
+
+        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.J_conta('Objetos'), bg="#FF9933", activebackground="#FF9933")
+
+        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.J_conta('Paises'), bg="#FF9933", activebackground="#FF9933")
             
-        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10),command=lambda: self.J_conta("Programas De TV"),
-        bg="#FF9933", activebackground="#FF9933")
-        b_programasTv.pack(padx= 5, pady= 5)
-    
+        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.J_conta("Programas De TV"),    bg="#FF9933", activebackground="#FF9933")
+
+        l_pontu = tk.Label(self.janela, text=res[0][1], font=("Arial Black", 15), bg="#FF3333", 
+        borderwidth=2, relief="solid")
+
+        botV.pack(padx= 5, pady= 5, side=tk.LEFT, anchor="nw")
+        l_pontu.pack(pady= 5, padx= 5,side=tk.RIGHT, anchor="ne")        
+        l_nome.pack(pady= 5)
+        b_ranque.pack(pady= (5, 30))
+        b_cores.pack(pady=5)
+        b_animais.pack(pady=5)
+        b_objetos.pack(pady=5)
+        b_paises.pack(pady=5)
+        b_programasTv.pack(pady= 5)
+        l_tema.pack(anchor="s", side= tk.BOTTOM)
+        
     def J_conta(self, temas):
         for widget in self.janela.winfo_children():
                 widget.destroy()
@@ -84,24 +109,19 @@ class Tela():
         self.janela.title('Escolha uma Dificuldade')
         self.janela.configure(bg='#3D89E1')
 
-    
         botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
         botV.pack(padx= 5, pady= 5, anchor= tk.W)
-
-        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),
-        bg="#FF9933", activebackground="#FF9933")
-        b_ranque.pack(padx= 5, pady= 5)
             
-        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), command=lambda: self.dificuldadeF(temas, "faz o L"),
+        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), height=2 ,width=20,command=lambda: self.dificuldadeF(temas, "faz o L"),
         bg="#FF9933", activebackground="#FF9933")
         b_facil.pack(padx= 5, pady= 5)
 
-        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), command=lambda: self.dificuldadeM(temas,"faz o L"),
+        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), height=2 ,width=20,command=lambda: self.dificuldadeM(temas,"faz o L"),
         bg="#FF9933", activebackground="#FF9933")
         b_medio.pack(padx= 5, pady= 5)
 
-        b_dificil = tk.Button(self.janela, text= "difícil", font=("Arial Black", 10), command=lambda: self.dificuldadeD(temas, "faz o L"),
+        b_dificil = tk.Button(self.janela, text= "Difícil", font=("Arial Black", 10), height=2 ,width=20,command=lambda: self.dificuldadeD(temas, "faz o L"),
         bg="#FF9933", activebackground="#FF9933")
         b_dificil.pack(padx= 5, pady= 5)
 
@@ -130,15 +150,16 @@ class Tela():
             self.e_senha.pack(padx= 5, pady= (0, 5))
             
             b_entrar = tk.Button(self.janela, text= "Logar", font=("Arial Black", 10), 
-            bg="#FF9933", activebackground="#FF9933", command= self.logar)
+            bg="#FF9933", activebackground="#FF9933", command=self.logar)
             b_entrar.pack(padx= 5, pady= 5)
 
     def logar(self):
         email =self.e_email.get()
         senha=self.e_senha.get()
+        self.id = 0
         con = sqlite3.connect('banco7.db')
         cursor = con.cursor()
-        cursor.execute("SELECT jog_email, jog_senha FROM jogadores")
+        cursor.execute("SELECT jog_email, jog_senha,id_jogador FROM jogadores")
         res=cursor.fetchall()
         con.close()
         senhaV = False
@@ -148,6 +169,8 @@ class Tela():
             if x[0] == email and x[1] == senha:
                 emailV = True
                 senhaV = True
+                self.id=x[2]
+
 
         for row in res:
                 if emailV and senhaV:  # Supondo que o email está na terceira coluna e a senha na quarta coluna
@@ -156,6 +179,7 @@ class Tela():
                     self.abrir_categorias()
                 return 
         messagebox.showinfo('Aviso', 'O Email ou Senha Estão Incorretos')
+    
 
     def cadastrar(self):
             for widget in self.janela.winfo_children():
@@ -230,32 +254,38 @@ class Tela():
         self.janela.geometry('800x600')
         self.janela.title('Visitante')
         self.janela.configure(bg='#3D89E1')
-    
+
+
+
         botV = tk.Button(self.janela, image=self.b_volta, command= self.volta, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.pack(padx= 5, pady= 5, anchor= tk.W)
 
-        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10), command=lambda: self.forcaVisitante("Cores"),
-                    bg="#FF9933", activebackground="#FF9933")
-        b_cores.pack(padx=5, pady=5)
+        l_espa = tk.Label(self.janela, height=5, bg='#3D89E1')
+        b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10),height=2 ,width=20, 
+        command=lambda: self.forcaVisitante("Cores"), bg="#FF9933", activebackground="#FF9933")
 
-        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Animais'),
-                            bg="#FF9933", activebackground="#FF9933")
-        b_animais.pack(padx=5, pady=5)
+        b_animais = tk.Button(self.janela, text="Animais", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.forcaVisitante('Animais'), bg="#FF9933", activebackground="#FF9933")
 
-        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Objetos'),
-                            bg="#FF9933", activebackground="#FF9933")
-        b_objetos.pack(padx=5, pady=5)
+        b_objetos = tk.Button(self.janela, text="Objetos", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.forcaVisitante('Objetos'), bg="#FF9933", activebackground="#FF9933")
 
-        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), command=lambda: self.forcaVisitante('Paises'),
-                            bg="#FF9933", activebackground="#FF9933")
-        b_paises.pack(padx=5, pady=5)
+        b_paises = tk.Button(self.janela, text="Paises", font=("Arial Black", 10), height=2 ,width=20,
+        command=lambda: self.forcaVisitante('Paises'), bg="#FF9933", activebackground="#FF9933")
         
-        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10),command=lambda: self.forcaVisitante("Programas De TV"),
-        bg="#FF9933", activebackground="#FF9933")
-        b_programasTv.pack(padx= 5, pady= 5)
+        b_programasTv = tk.Button(self.janela, text= "Programas De TV", font=("Arial Black", 10),height=2 ,width=20,
+        command=lambda: self.forcaVisitante("Programas De TV"), bg="#FF9933", activebackground="#FF9933")
 
-        
+        l_tema = tk.Label(self.janela, image= self.apontaD, bg='#3D89E1')
+
+        botV.pack(padx= (5,0), pady= 5, side=tk.LEFT, anchor="nw")
+        l_espa.pack(pady=5)
+        b_cores.pack(pady=(30,5))
+        b_animais.pack(pady=5)
+        b_objetos.pack(pady=5)
+        b_paises.pack(pady=5)
+        b_programasTv.pack(pady= 5)
+        l_tema.pack(side= tk.BOTTOM, anchor="s", pady=(5,0))
     
     def forcaVisitante(self,tex):
         tema = tex
@@ -275,19 +305,19 @@ class Tela():
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
         botV.pack(padx= 5, pady= 5, anchor= tk.W)
 
-        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),
+        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),height=2 ,width=20,
         bg="#FF9933", activebackground="#FF9933")
         b_ranque.pack(padx= 5, pady= 5)
             
-        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), 
+        b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), height=2 ,width=20,
         command=lambda: self.dificuldadeF(tema, "Visitante"), bg="#FF9933", activebackground="#FF9933")
         b_facil.pack(padx= 5, pady= 5)
 
-        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), 
+        b_medio = tk.Button(self.janela, text= "Médio", font=("Arial Black", 10), height=2 ,width=20,
         command=lambda: self.dificuldadeM(tema, "Visitante"), bg="#FF9933", activebackground="#FF9933")
         b_medio.pack(padx= 5, pady= 5)
 
-        b_dificil = tk.Button(self.janela, text= "difícil", font=("Arial Black", 10), 
+        b_dificil = tk.Button(self.janela, text= "Difícil", font=("Arial Black", 10), height=2 ,width=20,
         command=lambda: self.dificuldadeD(tema,"Visitante"), bg="#FF9933", activebackground="#FF9933")
         b_dificil.pack(padx= 5, pady= 5)
         
@@ -305,14 +335,17 @@ class Tela():
             botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+            
+            forca = Forca(self.janela, "Facil", tema)
+            forca.grid(row=1, column=0)
         
         else:
             botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
 
-        forca = Forca(self.janela, "Facil", tema)
-        forca.grid(row=1, column=0)
+            forca = Forca(self.janela, "Facil", tema,self.id)
+            forca.grid(row=1, column=0)
     
     def dificuldadeM(self,tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -323,19 +356,21 @@ class Tela():
         self.janela.title('Forca Médio')
         self.janela.configure(bg='#3D89E1')
         
-        if T_conta == "Visitanta":
+        if T_conta == "Visitante":
             botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+            
+            forca = Forca(self.janela, "Media", tema)
+            forca.grid(row=1, column=0)
         
         else:
             botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
-
-        forca = Forca(self.janela, "Medio", tema)
-        forca.grid(row=1, column=0)
-
+            
+            forca = Forca(self.janela, "Media", tema,self.id)
+            forca.grid(row=1, column=0)
     
     def dificuldadeD(self, tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -346,18 +381,21 @@ class Tela():
         self.janela.title('Forca Difícil')
         self.janela.configure(bg='#3D89E1')
         
-        if T_conta == "Visitanta":
+        if T_conta == "Visitante":
             botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
+
+            forca = Forca(self.janela, "Dificil", tema)
+            forca.grid(row=1, column=0)
         
         else:
             botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
             botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
 
-        forca = Forca(self.janela, "Dificil", tema)
-        forca.grid(row=1, column=0)
+            forca = Forca(self.janela, "Dificil", tema,self.id)
+            forca.grid(row=1, column=0)
 
     def tem_certeza(self):
         vai = messagebox.askokcancel(title= "Tem certeza?", message = "Quer mesmo sair de sua conta?", icon=messagebox.WARNING)
