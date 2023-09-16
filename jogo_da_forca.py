@@ -4,8 +4,9 @@ import random
 import sqlite3
 from sqlite3 import Error
 
+
 class Forca(Frame):
-    def __init__(self, master, dificuldade, tema, conta = 0):
+    def __init__(self, master, dificuldade, tema, exodia, conta = 0):
         Frame.__init__(self, master)
         # inicializa variáveis
         self.temas = tema
@@ -13,14 +14,15 @@ class Forca(Frame):
         self.palavra = None
         self.letras_digitadas = None
         self.palavra_secreta = None
-        self.contador = None
+        self.contador = 6
         self.dificuldade = dificuldade
         self.id_conta=conta
+        self.exodia = exodia
 
         # inicializa widgets do jogo
         self.create_widgets()
         # re-inicializa variáveis do jogo
-        self.inicio_jogo() 
+        self.inicio_jogo()
 
     def reset_cores_botoes(self):
         self.letraA.configure(background=self.cores_padrao_botoes[0])
@@ -53,6 +55,8 @@ class Forca(Frame):
 
     def inicio_jogo(self):
         self.reset_cores_botoes()
+        self.atu_ponto()
+        self.exodia.reinicia()
         self.letras_digitadas = []
         self.palavra_secreta = []
         self.contador = 6
@@ -60,9 +64,7 @@ class Forca(Frame):
         #elf.tema_atual = self.temas[self.tema_id - 1]
         #self.tema_atual_label['text'] = self.tema_atual
         self.palavra_secreta_label['text'] = ""    
-                
         self.sorteia_palavra()
-    
         
     def set_letras_digitadas(self, letras):
         chute = False
@@ -132,7 +134,8 @@ class Forca(Frame):
         if chute == False:
             try: 
                 if l in self.letras_digitadas:    
-                    self.contador -= 1            
+                    self.contador -= 1
+                    self.exodia.atua(self.contador)
                     if l == "A" or l == "Á" or l == "Â" or l == "Ã":
                         l = letra
                         self.letraA.configure(background="#737991", activebackground="#737991")
@@ -193,23 +196,32 @@ class Forca(Frame):
         if self.contador <= 0:
             messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
             messagebox.showinfo("Info", "A palavra secreta era:\n{0}".format(self.palavra))
+            self.exodia.reinicia()
             self.inicio_jogo()
 
         # Atualiza na tela as letras encontradas na palavra secreta        
         self.palavra_secreta_label['text'] = ' '.join(self.palavra_secreta)
 
         if "_" not in self.palavra_secreta:
-            messagebox.showinfo("Congrats", "Parabéns você acertou a palavra secreta\n{}".format(self.palavra))
             con = sqlite3.connect('banco7.db')
             cursor = con.cursor()
-            cursor.execute(f"UPDATE jogadores set jog_pontuacao='{self.contador*100}' WHERE id_jogador = '{self.id_conta}'")
+            
+            if self.resultado[1] == "Facil":
+                messagebox.showinfo("Congrats", f"Parabéns você acertou a palavra secreta, {self.palavra} e ganhou {self.contador*25} pontos!")
+                cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (self.contador*25)}' WHERE id_jogador = '{self.id_conta}'")
+            
+            elif self.resultado[1] == "Media":
+                messagebox.showinfo("Congrats", f"Parabéns você acertou a palavra secreta, {self.palavra} e ganhou {self.contador*50} pontos!")
+                cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (self.contador*50)}' WHERE id_jogador = '{self.id_conta}'")
+            
+            elif self.resultado[1] == "Dificil":
+                messagebox.showinfo("Congrats", f"Parabéns você acertou a palavra secreta, {self.palavra} e ganhou {self.contador*100} pontos!")
+                cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (self.contador*100)}' WHERE id_jogador = '{self.id_conta}'")
+            
             con.commit()
             con.close()
-            self.inicio_jogo()
             
-    def reinicia(self):
-        for widget in self.janela.winfo_children():
-                widget.destroy()
+            self.inicio_jogo()
 
     def sorteia_palavra(self):
         con = sqlite3.connect('banco7.db')
@@ -218,12 +230,12 @@ class Forca(Frame):
         cursor.execute(f"SELECT tem_id FROM temas WHERE tem_nome = ?", (self.temas,))
         id = cursor.fetchone()
 
-        cursor.execute(f"SELECT pal_palavra FROM palavras WHERE tem_id_fk = {id[0]} AND pal_dificuldade = ? ORDER BY RANDOM() LIMIT 1", (self.dificuldade,))
-        resultado = cursor.fetchone()
+        cursor.execute(f"SELECT pal_palavra, pal_dificuldade FROM palavras WHERE tem_id_fk = {id[0]} AND pal_dificuldade = ? ORDER BY RANDOM() LIMIT 1", (self.dificuldade,))
+        self.resultado = cursor.fetchone()
 
         
-        if resultado:
-            self.palavra = resultado[0].upper()
+        if self.resultado:
+            self.palavra = self.resultado[0].upper()
             self.palavra_secreta = ["_" if char.isalpha() else char for char in self.palavra]
         else:
             
@@ -234,9 +246,7 @@ class Forca(Frame):
 
         self.palavra_secreta_label['text'] = " ".join(self.palavra_secreta)
 
-
     def create_widgets(self):
- 
         self.frame1 = Frame(self, relief = SUNKEN, borderwidth=8)
         self.frame1.grid(row=5)
 
@@ -353,7 +363,6 @@ class Forca(Frame):
             cursor = con.cursor()
             cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
             self.pontu = cursor.fetchone()
-            print(self.pontu)
 
             self.chances_restantes_label = Label(self.frame3, text="Pontuação", font=("Helvetica", 12))
             self.chances_restantes_label.grid(row=0, columnspan=6)
@@ -371,11 +380,15 @@ class Forca(Frame):
 
         self.palavra_secreta_label = Label(self.frame4, font=("Helvetica", 20), text="", padx=10, pady=10)        
         self.palavra_secreta_label.grid(row=1, column=0, sticky="W")
-
-
-
+    
+    def atu_ponto(self):
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
+        self.pontu = cursor.fetchone()
+        self.label_contador.configure(text= self.pontu)
+    
 def main():
     forca = Tk()
-    app = Forca(forca).grid()
+    app = Forca(forca)
     forca.mainloop()
-

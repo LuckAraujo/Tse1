@@ -1,31 +1,23 @@
 import tkinter as tk
 
-# Função a ser executada quando o primeiro botão for pressionado
-def botao1_click():
-    print("Botão 1 foi pressionado")
+def criar_borda_colorida(frame, cor, largura=1):
+    # Top
+    frame.create_line(0, 0, frame.winfo_width(), 0, fill=cor, width=largura)
+    # Bottom
+    frame.create_line(0, frame.winfo_height(), frame.winfo_width(), frame.winfo_height(), fill=cor, width=largura)
+    # Left
+    frame.create_line(0, 0, 0, frame.winfo_height(), fill=cor, width=largura)
+    # Right
+    frame.create_line(frame.winfo_width(), 0, frame.winfo_width(), frame.winfo_height(), fill=cor, width=largura)
 
-# Função a ser executada quando o segundo botão for pressionado
-def botao2_click():
-    print("Botão 2 foi pressionado")
+root = tk.Tk()
+root.title("Exemplo de Mudança de Cor de Borda em um Frame")
 
-# Crie uma janela principal
-janela = tk.Tk()
-janela.title("Exemplo de Botões")
+# Criar o frame
+frame = tk.Canvas(root, width=200, height=200, bg='white')
+frame.pack(padx=20, pady=20)
 
-# Crie os botões
-botao1 = tk.Button(janela, text="Botão 1", command=botao1_click)
-botao2 = tk.Button(janela, text="Botão 2", command=botao2_click)
-botao3 = tk.Button(janela, text="Botão 3", command=botao1_click)
-botao4 = tk.Button(janela, text="Botão 3", command=botao1_click)
-botao5 = tk.Button(janela, text="Botão 3", command=botao1_click)
+# Chamar a função para criar a borda colorida
+criar_borda_colorida(frame, cor='blue', largura=5)
 
-# Use o método pack para colocar os botões na mesma linha
-botao1.pack(side=tk.LEFT, anchor="nw")
-botao2.pack(side=tk.RIGHT, anchor="ne")
-botao3.pack()
-botao4.pack()
-botao5.pack()
-
-
-# Inicie o loop principal da interface gráfica
-janela.mainloop()
+root.mainloop()

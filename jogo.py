@@ -1,9 +1,11 @@
-import sqlite3
 import re
 import os
+import sqlite3
 import tkinter as tk
+from tkinter import ttk
 from tkinter import PhotoImage, messagebox
 from jogo_da_forca import Forca
+from o_proibido import Exodia
 
 class Tela():
     def __init__(self, master):
@@ -15,7 +17,6 @@ class Tela():
         self.janela.geometry('800x600')
         self.janela.title('Tela De Play')
         self.janela.configure(bg='#3D89E1')
-        self.janela.title('Tela De Play')
 
         pastaAPP = os.path.dirname(__file__)
         img_path = os.path.join(pastaAPP, "imagem", "Logo.png")
@@ -66,8 +67,8 @@ class Tela():
         l_nome = tk.Button(self.janela, text=res[0][0],font=("Arial Black", 10), height=1 ,width=10,
         bg="#FFFF33", relief="raised",activebackground= "#FFFF33")
 
-        b_ranque = tk.Button(self.janela, text= "Ranque",height=2 ,width=20, font=("Arial Black", 10),
-        bg="#FFFF66", activebackground="#FFFF66")
+        b_ranque = tk.Button(self.janela, text= "Ranking",height=2 ,width=20, font=("Arial Black", 10),
+        bg="#FFFF66", activebackground="#FFFF66",command=self.ranking)
 
         l_tema = tk.Label(self.janela, image= self.apontaD, bg='#3D89E1')
 
@@ -99,7 +100,43 @@ class Tela():
         b_paises.pack(pady=5)
         b_programasTv.pack(pady= 5)
         l_tema.pack(anchor="s", side= tk.BOTTOM)
-        
+    
+    def ranking(self):
+        for widget in self.janela.winfo_children():
+             widget.destroy()
+                
+        self.janela.geometry('800x600')
+        self.janela.title('Ranking')
+        self.janela.configure(bg='#3D89E1')
+
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT jog_nome, jog_pontuacao FROM jogadores ORDER BY jog_pontuacao DESC;")
+        res = cursor.fetchall()
+        con.close()
+
+        botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, side=tk.LEFT, anchor="nw")
+
+        treeview = ttk.Treeview(self.janela, columns=("Position", "Name", "Score"), show="headings")
+        treeview.heading("Position", text="Posição")
+        treeview.heading("Name", text="Nome")
+        treeview.heading("Score", text="Pontuação")
+        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview)
+        self.atualizar_button.pack()
+
+        # Chama a função para preencher o TreeView
+        self.preencher_treeview(treeview, res)
+
+        treeview.pack()
+    def atualizar_treeview(self):
+        self.ranking()
+    
+    def preencher_treeview(self, treeview, data):
+        for position, (name, score) in enumerate(data, start=1):
+            treeview.insert("", "end", values=(position, name, score))
+
     def J_conta(self, temas):
         for widget in self.janela.winfo_children():
                 widget.destroy()
@@ -255,12 +292,12 @@ class Tela():
         self.janela.title('Visitante')
         self.janela.configure(bg='#3D89E1')
 
-
-
         botV = tk.Button(self.janela, image=self.b_volta, command= self.volta, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
 
-        l_espa = tk.Label(self.janela, height=5, bg='#3D89E1')
+        b_ranque = tk.Button(self.janela, text= "Ranking",height=2 ,width=20, font=("Arial Black", 10),
+        bg="#FFFF66", activebackground="#FFFF66",command=self.rankingV)
+        
         b_cores = tk.Button(self.janela, text="Cores", font=("Arial Black", 10),height=2 ,width=20, 
         command=lambda: self.forcaVisitante("Cores"), bg="#FF9933", activebackground="#FF9933")
 
@@ -278,8 +315,11 @@ class Tela():
 
         l_tema = tk.Label(self.janela, image= self.apontaD, bg='#3D89E1')
 
+        l_pontu = tk.Label(self.janela, text="Luck", fg='#3D89E1', bg="#3D89E1")
+
         botV.pack(padx= (5,0), pady= 5, side=tk.LEFT, anchor="nw")
-        l_espa.pack(pady=5)
+        l_pontu.pack(pady= 5, padx= 5,side=tk.RIGHT, anchor="ne")
+        b_ranque.pack(pady= (35,5))        
         b_cores.pack(pady=(30,5))
         b_animais.pack(pady=5)
         b_objetos.pack(pady=5)
@@ -304,10 +344,6 @@ class Tela():
         botV = tk.Button(self.janela, image=self.b_volta,command= self.visitante, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
         botV.pack(padx= 5, pady= 5, anchor= tk.W)
-
-        b_ranque = tk.Button(self.janela, text= "Ranque", font=("Arial Black", 10),height=2 ,width=20,
-        bg="#FF9933", activebackground="#FF9933")
-        b_ranque.pack(padx= 5, pady= 5)
             
         b_facil = tk.Button(self.janela, text= "Fácil", font=("Arial Black", 10), height=2 ,width=20,
         command=lambda: self.dificuldadeF(tema, "Visitante"), bg="#FF9933", activebackground="#FF9933")
@@ -320,7 +356,36 @@ class Tela():
         b_dificil = tk.Button(self.janela, text= "Difícil", font=("Arial Black", 10), height=2 ,width=20,
         command=lambda: self.dificuldadeD(tema,"Visitante"), bg="#FF9933", activebackground="#FF9933")
         b_dificil.pack(padx= 5, pady= 5)
-        
+
+    def rankingV(self):
+        for widget in self.janela.winfo_children():
+             widget.destroy()
+                
+        self.janela.geometry('800x600')
+        self.janela.title('Ranking')
+        self.janela.configure(bg='#3D89E1')
+
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT jog_nome, jog_pontuacao FROM jogadores ORDER BY jog_pontuacao DESC;")
+        res = cursor.fetchall()
+        con.close()
+
+        botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+        background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
+        botV.pack(padx= 5, pady= 5, side=tk.LEFT, anchor="nw")
+
+        treeview = ttk.Treeview(self.janela, columns=("Position", "Name", "Score"), show="headings")
+        treeview.heading("Position", text="Posição")
+        treeview.heading("Name", text="Nome")
+        treeview.heading("Score", text="Pontuação")
+        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview)
+        self.atualizar_button.pack()
+
+        # Chama a função para preencher o TreeView
+        self.preencher_treeview(treeview, res)
+
+        treeview.pack()
     
     def dificuldadeF(self, tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -332,20 +397,28 @@ class Tela():
         self.janela.configure(bg='#3D89E1')
 
         if T_conta == "Visitante":
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.visitante,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
             
-            forca = Forca(self.janela, "Facil", tema)
-            forca.grid(row=1, column=0)
-        
+            frame = tk.Frame(self.janela, bg='#3D89E1',  highlightbackground='#3D89E1')
+            exodia = Exodia(frame, 6)
+            forca = Forca(self.janela, "Facil", tema, exodia, 0)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
+            
         else:
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.abrir_categorias,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
-
-            forca = Forca(self.janela, "Facil", tema,self.id)
-            forca.grid(row=1, column=0)
+            
+            frame = tk.Frame(self.janela, bg='#3D89E1',  highlightbackground='#3D89E1')
+            exodia = Exodia(frame,6)
+            forca = Forca(self.janela, "Facil", tema, exodia, self.id)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
     
     def dificuldadeM(self,tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -357,20 +430,28 @@ class Tela():
         self.janela.configure(bg='#3D89E1')
         
         if T_conta == "Visitante":
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.visitante,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
             
-            forca = Forca(self.janela, "Media", tema)
-            forca.grid(row=1, column=0)
-        
+            frame = tk.Frame(self.janela, bg='#3D89E1', highlightbackground='#3D89E1')
+            exodia = Exodia(frame,6)
+            forca = Forca(self.janela, "Media", tema, exodia, 0)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
+            
         else:
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.abrir_categorias,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
             
-            forca = Forca(self.janela, "Media", tema,self.id)
-            forca.grid(row=1, column=0)
+            frame = tk.Frame(self.janela, bg='#3D89E1', highlightbackground='#3D89E1')
+            exodia = Exodia(frame,6)
+            forca = Forca(self.janela, "Media", tema, exodia, self.id)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
     
     def dificuldadeD(self, tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -382,20 +463,28 @@ class Tela():
         self.janela.configure(bg='#3D89E1')
         
         if T_conta == "Visitante":
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.visitante,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
-
-            forca = Forca(self.janela, "Dificil", tema)
-            forca.grid(row=1, column=0)
-        
+            
+            frame = tk.Frame(self.janela, bg='#3D89E1',  highlightbackground='#3D89E1')
+            exodia = Exodia(frame,6)
+            forca = Forca(self.janela, "Dificil", tema, exodia, 0)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
+            
         else:
-            botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
+            botV = tk.Button(self.janela, image=self.b_volta, command=self.abrir_categorias,
             background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-            botV.grid(row=0, column=0, padx= 5, pady= 5, sticky="W")
-
-            forca = Forca(self.janela, "Dificil", tema,self.id)
-            forca.grid(row=1, column=0)
+            
+            frame = tk.Frame(self.janela, bg='#3D89E1',  highlightbackground='#3D89E1')
+            exodia = Exodia(frame,6)
+            forca = Forca(self.janela, "Dificil", tema, exodia, self.id)
+            
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            forca.pack(side= tk.LEFT, anchor="w")
+            frame.pack(side= tk.RIGHT, padx= 30)
 
     def tem_certeza(self):
         vai = messagebox.askokcancel(title= "Tem certeza?", message = "Quer mesmo sair de sua conta?", icon=messagebox.WARNING)
