@@ -1,23 +1,22 @@
 import tkinter as tk
 
-def criar_borda_colorida(frame, cor, largura=1):
-    # Top
-    frame.create_line(0, 0, frame.winfo_width(), 0, fill=cor, width=largura)
-    # Bottom
-    frame.create_line(0, frame.winfo_height(), frame.winfo_width(), frame.winfo_height(), fill=cor, width=largura)
-    # Left
-    frame.create_line(0, 0, 0, frame.winfo_height(), fill=cor, width=largura)
-    # Right
-    frame.create_line(frame.winfo_width(), 0, frame.winfo_width(), frame.winfo_height(), fill=cor, width=largura)
+def on_scroll(*args):
+    scroll_y = float(args[0])
+    text_widget.yview_moveto(scroll_y)
 
 root = tk.Tk()
-root.title("Exemplo de Mudança de Cor de Borda em um Frame")
+root.title("Scrollbar Color")
 
-# Criar o frame
-frame = tk.Canvas(root, width=200, height=200, bg='white')
-frame.pack(padx=20, pady=20)
+# Barra de rolagem vertical
+scrollbar = tk.Scrollbar(root, command=on_scroll)
+scrollbar.pack(side="right", fill="y")
 
-# Chamar a função para criar a borda colorida
-criar_borda_colorida(frame, cor='blue', largura=5)
+# Widget de texto associado à barra de rolagem
+text_widget = tk.Text(root, yscrollcommand=scrollbar.set)
+text_widget.pack(fill="both", expand=True)
+
+# Adicione algum texto de exemplo ao widget de texto
+for i in range(100):
+    text_widget.insert(tk.END, f"Line {i}\n")
 
 root.mainloop()

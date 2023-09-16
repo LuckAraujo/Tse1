@@ -64,7 +64,7 @@ class Tela():
         botV = tk.Button(self.janela, image=self.b_volta, command= self.tem_certeza, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
                 
-        l_nome = tk.Button(self.janela, text=res[0][0],font=("Arial Black", 10), height=1 ,width=10,
+        l_nome = tk.Label(self.janela, text=res[0][0],font=("Arial Black", 15), height=1 ,width=10,
         bg="#FFFF33", relief="raised",activebackground= "#FFFF33")
 
         b_ranque = tk.Button(self.janela, text= "Ranking",height=2 ,width=20, font=("Arial Black", 10),
@@ -117,21 +117,45 @@ class Tela():
 
         botV = tk.Button(self.janela, image=self.b_volta, command= self.abrir_categorias, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.pack(padx= 5, pady= 5, side=tk.LEFT, anchor="nw")
+        botV.pack(padx= (5,0), pady= 5, side=tk.LEFT, anchor="nw")
 
-        treeview = ttk.Treeview(self.janela, columns=("Position", "Name", "Score"), show="headings")
+        styli =  ttk.Style()
+        styli.configure("Treeview", font=("Arial Black", 10), rowheight = 25)
+        
+        styli.configure("Treeview",background="#FFB266")
+        
+        styli.map("Treeview", background=[('selected', '#B2FF66')], foreground=[('selected', 'black')])
+
+        frame = tk.Frame(self.janela)
+
+        treeview = ttk.Treeview(frame, columns=("Position", "Name", "Score"), show="headings")
         treeview.heading("Position", text="Posição")
         treeview.heading("Name", text="Nome")
         treeview.heading("Score", text="Pontuação")
-        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview)
-        self.atualizar_button.pack()
+
+        self.scrollbar = ttk.Scrollbar(frame, orient="vertical", command=treeview.yview)
+        treeview.configure(yscrollcommand=self.scrollbar.set)
+        
+        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview,
+        bg="#FFFF66", activebackground="#FFFF66", font=("Arial Black", 10), height=2 ,width=20)
+        
+        treeview.column('Position', width=75, anchor=tk.CENTER)
+        treeview.column('Name', width=100, anchor=tk.CENTER)
+        treeview.column('Score', width=100, anchor=tk.CENTER)
+        treeview.configure(style="Treeview")
+
+        styli.configure("Treeview.Heading", font=("Arial Black", 10))
 
         # Chama a função para preencher o TreeView
         self.preencher_treeview(treeview, res)
 
-        treeview.pack()
+        frame.pack(pady=(50,15), side= tk.TOP)
+        treeview.grid(row=0, column=0, )
+        self.scrollbar.grid(row = 0, column=1, sticky=(tk.N, tk.S))
+        self.atualizar_button.pack(padx= 5, pady=5)
+
     def atualizar_treeview(self):
-        self.ranking()
+        self.rankingV()
     
     def preencher_treeview(self, treeview, data):
         for position, (name, score) in enumerate(data, start=1):
@@ -361,7 +385,7 @@ class Tela():
         for widget in self.janela.winfo_children():
              widget.destroy()
                 
-        self.janela.geometry('800x600')
+        self.janela.geometry('600x458')
         self.janela.title('Ranking')
         self.janela.configure(bg='#3D89E1')
 
@@ -373,19 +397,43 @@ class Tela():
 
         botV = tk.Button(self.janela, image=self.b_volta, command= self.visitante, 
         background="#3D89E1", activebackground="#3D89E1", borderwidth=0)
-        botV.pack(padx= 5, pady= 5, side=tk.LEFT, anchor="nw")
+        botV.pack(padx= (5,0), pady= 5, side=tk.LEFT, anchor="nw")
 
-        treeview = ttk.Treeview(self.janela, columns=("Position", "Name", "Score"), show="headings")
+        styli =  ttk.Style()
+        styli.configure("Treeview", font=("Arial Black", 10), rowheight = 25)
+        
+        styli.configure("Treeview",background="#FFB266")
+        
+        styli.map("Treeview", background=[('selected', '#B2FF66')], foreground=[('selected', 'black')])
+
+        frame = tk.Frame(self.janela)
+
+        treeview = ttk.Treeview(frame, columns=("Position", "Name", "Score"), show="headings")
         treeview.heading("Position", text="Posição")
         treeview.heading("Name", text="Nome")
         treeview.heading("Score", text="Pontuação")
-        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview)
-        self.atualizar_button.pack()
+
+        self.scrollbar = ttk.Scrollbar(frame, orient="vertical", command=treeview.yview)
+        treeview.configure(yscrollcommand=self.scrollbar.set)
+        
+        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview,
+        bg="#FFFF66", activebackground="#FFFF66", font=("Arial Black", 10), height=2 ,width=20)
+        
+        treeview.column('Position', width=75, anchor=tk.CENTER)
+        treeview.column('Name', width=100, anchor=tk.CENTER)
+        treeview.column('Score', width=100, anchor=tk.CENTER)
+        treeview.configure(style="Treeview")
+
+        styli.configure("Treeview.Heading", font=("Arial Black", 10))
 
         # Chama a função para preencher o TreeView
         self.preencher_treeview(treeview, res)
 
-        treeview.pack()
+        frame.pack(pady=(50,15), side= tk.TOP)
+        treeview.grid(row=0, column=0, )
+        self.scrollbar.grid(row = 0, column=1, sticky=(tk.N, tk.S))
+        self.atualizar_button.pack(padx= 5, pady=5)
+
     
     def dificuldadeF(self, tema, T_conta):
         for widget in self.janela.winfo_children():
@@ -404,7 +452,7 @@ class Tela():
             exodia = Exodia(frame, 6)
             forca = Forca(self.janela, "Facil", tema, exodia, 0)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
             
@@ -416,7 +464,7 @@ class Tela():
             exodia = Exodia(frame,6)
             forca = Forca(self.janela, "Facil", tema, exodia, self.id)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
     
@@ -437,7 +485,7 @@ class Tela():
             exodia = Exodia(frame,6)
             forca = Forca(self.janela, "Media", tema, exodia, 0)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
             
@@ -449,7 +497,7 @@ class Tela():
             exodia = Exodia(frame,6)
             forca = Forca(self.janela, "Media", tema, exodia, self.id)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
     
@@ -470,7 +518,7 @@ class Tela():
             exodia = Exodia(frame,6)
             forca = Forca(self.janela, "Dificil", tema, exodia, 0)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
             
@@ -482,10 +530,10 @@ class Tela():
             exodia = Exodia(frame,6)
             forca = Forca(self.janela, "Dificil", tema, exodia, self.id)
             
-            botV.pack(side= tk.LEFT, anchor="nw", pady=5)
+            botV.pack(side= tk.LEFT, anchor="nw", pady=5, padx=5)
             forca.pack(side= tk.LEFT, anchor="w")
             frame.pack(side= tk.RIGHT, padx= 30)
-
+           
     def tem_certeza(self):
         vai = messagebox.askokcancel(title= "Tem certeza?", message = "Quer mesmo sair de sua conta?", icon=messagebox.WARNING)
         if vai:

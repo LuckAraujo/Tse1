@@ -194,8 +194,28 @@ class Forca(Frame):
                 pass    
         
         if self.contador <= 0:
-            messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
-            messagebox.showinfo("Info", "A palavra secreta era:\n{0}".format(self.palavra))
+            con = sqlite3.connect('banco7.db')
+            cursor = con.cursor()
+            print("luck")
+            if self.resultado[1] == "Facil":
+                    print("l ")
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (5*30)}' WHERE id_jogador = '{self.id_conta}'")
+                    messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
+                    messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {5*30} pontos!")
+            elif self.resultado[1] == "Media":
+                    print("u")
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (6*60)}' WHERE id_jogador = '{self.id_conta}'")
+                    messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
+                    messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {6*60} pontos!")
+            elif self.resultado[1] == "Dificil":
+                    print("c")
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (7*110)}' WHERE id_jogador = '{self.id_conta}'")
+                    messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
+                    messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {7*110} pontos!")
+
+            con.commit()
+            con.close()
+            
             self.exodia.reinicia()
             self.inicio_jogo()
 
@@ -386,7 +406,8 @@ class Forca(Frame):
         cursor = con.cursor()
         cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
         self.pontu = cursor.fetchone()
-        self.label_contador.configure(text= self.pontu)
+        if not self.id_conta == 0:
+            self.label_contador.configure(text= self.pontu)
     
 def main():
     forca = Tk()
