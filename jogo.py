@@ -105,7 +105,7 @@ class Tela():
         for widget in self.janela.winfo_children():
              widget.destroy()
                 
-        self.janela.geometry('800x600')
+        self.janela.geometry('600x458')
         self.janela.title('Ranking')
         self.janela.configure(bg='#3D89E1')
 
@@ -154,8 +154,11 @@ class Tela():
         self.scrollbar.grid(row = 0, column=1, sticky=(tk.N, tk.S))
         self.atualizar_button.pack(padx= 5, pady=5)
 
-    def atualizar_treeview(self):
+    def atualizar_treeviewV(self):
         self.rankingV()
+    
+    def atualizar_treeview(self):
+        self.ranking()
     
     def preencher_treeview(self, treeview, data):
         for position, (name, score) in enumerate(data, start=1):
@@ -416,7 +419,7 @@ class Tela():
         self.scrollbar = ttk.Scrollbar(frame, orient="vertical", command=treeview.yview)
         treeview.configure(yscrollcommand=self.scrollbar.set)
         
-        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeview,
+        self.atualizar_button = tk.Button(self.janela, text="Atualizar", command=self.atualizar_treeviewV,
         bg="#FFFF66", activebackground="#FFFF66", font=("Arial Black", 10), height=2 ,width=20)
         
         treeview.column('Position', width=75, anchor=tk.CENTER)

@@ -196,22 +196,38 @@ class Forca(Frame):
         if self.contador <= 0:
             con = sqlite3.connect('banco7.db')
             cursor = con.cursor()
-            print("luck")
-            if self.resultado[1] == "Facil":
-                    print("l ")
-                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (5*30)}' WHERE id_jogador = '{self.id_conta}'")
+            if self.resultado[1] == "Facil" and not int(self.pontu[0]) == 0:
+                    if int(self.pontu[0]) < (5*30):
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    else:
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (5*30)}' WHERE id_jogador = '{self.id_conta}'")
+                    
                     messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
                     messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {5*30} pontos!")
-            elif self.resultado[1] == "Media":
-                    print("u")
-                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (6*60)}' WHERE id_jogador = '{self.id_conta}'")
+
+            elif self.resultado[1] == "Media" and not int(self.pontu[0]) == 0:
+                    if int(self.pontu[0]) < (6*60):
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    else:
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (6*60)}' WHERE id_jogador = '{self.id_conta}'")
+                    
                     messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
                     messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {6*60} pontos!")
-            elif self.resultado[1] == "Dificil":
-                    print("c")
-                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) + (7*110)}' WHERE id_jogador = '{self.id_conta}'")
+
+            elif self.resultado[1] == "Dificil" and not int(self.pontu[0]) == 0:
+                    if int(self.pontu[0]) < (7*110):
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    else:
+                        cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (7*110)}' WHERE id_jogador = '{self.id_conta}'")
+                    
                     messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
                     messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra} e perdeu: {7*110} pontos!")
+            
+            elif int(self.pontu[0]) == 0:
+                    messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
+                    messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra}")
+                    messagebox.showinfo("Alert", "\nParece que você ainda não tem pontos para perder        \n")
+
 
             con.commit()
             con.close()
@@ -350,9 +366,12 @@ class Forca(Frame):
 
         self.letraZ = Button(self.frame1, font=("Helvetica", 12), text="Z", borderwidth=1,padx=16, pady=16, command=lambda: self.set_letras_digitadas("Z"))
         self.letraZ.grid(row=3, column=4, sticky="NWNESWSE")
-
-        self.reiniciar = Button(self.frame1, font=("Helvetica", 12), text="Reiniciar", borderwidth=1,padx=16, pady=16, command= self.inicio_jogo)
-        self.reiniciar.grid(row=3, column=5,columnspan=2, sticky="NWNESWSE")
+        if self.id_conta == 0:
+            self.reiniciar = Button(self.frame1, font=("Helvetica", 12), text="Reiniciar", borderwidth=1,padx=16, pady=16, command= self.inicio_jogo)
+            self.reiniciar.grid(row=3, column=5,columnspan=2, sticky="NWNESWSE")
+        else:
+            self.reiniciar = Button(self.frame1, font=("Helvetica", 12), text="Reiniciar", borderwidth=1,padx=16, pady=16, command= self.reina)
+            self.reiniciar.grid(row=3, column=5,columnspan=2, sticky="NWNESWSE")
         # Fim teclado letras
 
         # Letras digitadas
@@ -383,13 +402,13 @@ class Forca(Frame):
             cursor = con.cursor()
             cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
             self.pontu = cursor.fetchone()
+            con.close()
 
             self.chances_restantes_label = Label(self.frame3, text="Pontuação", font=("Helvetica", 12))
             self.chances_restantes_label.grid(row=0, columnspan=6)
 
             self.label_contador = Label(self.frame3, font=("Helvetica", 20), text = self.pontu, padx=10, pady=10)        
             self.label_contador.grid(row=1, column=0, rowspan=2, columnspan=2)
-            con.close()
 
         # Palavra secreta
         self.frame4 = Frame(self, relief = SUNKEN,borderwidth=8)
@@ -401,11 +420,62 @@ class Forca(Frame):
         self.palavra_secreta_label = Label(self.frame4, font=("Helvetica", 20), text="", padx=10, pady=10)        
         self.palavra_secreta_label.grid(row=1, column=0, sticky="W")
     
+    def reina(self):
+        con = sqlite3.connect('banco7.db')
+        cursor = con.cursor()
+
+        if self.resultado[1] == "Facil" and not int(self.pontu[0]) == 0:
+            vai = messagebox.askokcancel(title= "Tem certeza?", message = f"Se reinicar vai perder: {3*30} pontos!", icon=messagebox.WARNING)
+            if vai:
+                if int(self.pontu[0]) < (3*30):
+                    print("luck")
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+                else:
+                    print("luck2")
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (3*30)}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+        elif self.resultado[1] == "Media" and not int(self.pontu[0]) == 0:
+            vai = messagebox.askokcancel(title= "Tem certeza?", message = f"Se reinicar vai perder:{4*60} pontos!", icon=messagebox.WARNING)
+            if vai:
+                if int(self.pontu[0]) < (4*60):
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+                else:
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (4*60)}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+        elif self.resultado[1] == "Dificil"  and not int(self.pontu[0]) == 0:
+            vai = messagebox.askokcancel(title= "Tem certeza?", message = f"Se reinicar vai perder:{5*110} pontos!", icon=messagebox.WARNING)
+            if vai:
+                if int(self.pontu[0]) < (5*110):
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+                else:
+                    cursor.execute(f"UPDATE jogadores set jog_pontuacao='{int(self.pontu[0]) - (5*110)}' WHERE id_jogador = '{self.id_conta}'")
+                    con.commit()
+                    con.close()
+
+        else:
+            self.inicio_jogo()
+        
+        self.inicio_jogo()
+            
     def atu_ponto(self):
         con = sqlite3.connect('banco7.db')
         cursor = con.cursor()
         cursor.execute(f"SELECT jog_pontuacao FROM jogadores WHERE id_jogador = ?", (self.id_conta,))
         self.pontu = cursor.fetchone()
+        
         if not self.id_conta == 0:
             self.label_contador.configure(text= self.pontu)
     
