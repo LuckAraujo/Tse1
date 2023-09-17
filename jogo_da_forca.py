@@ -196,7 +196,12 @@ class Forca(Frame):
         if self.contador <= 0:
             con = sqlite3.connect('banco7.db')
             cursor = con.cursor()
-            if self.resultado[1] == "Facil" and not int(self.pontu[0]) == 0:
+            
+            if self.id_conta == 0:
+                messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
+                messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra}")
+            
+            elif self.resultado[1] == "Facil" and not int(self.pontu[0]) == 0:
                     if int(self.pontu[0]) < (5*30):
                         cursor.execute(f"UPDATE jogadores set jog_pontuacao='{0}' WHERE id_jogador = '{self.id_conta}'")
                     else:
@@ -227,7 +232,6 @@ class Forca(Frame):
                     messagebox.showinfo("Alert", "\nVOCÊ PERDEU!!!!!!!!!!            \n")
                     messagebox.showinfo("Info", f"A palavra secreta era: {self.palavra}")
                     messagebox.showinfo("Alert", "\nParece que você ainda não tem pontos para perder        \n")
-
 
             con.commit()
             con.close()
